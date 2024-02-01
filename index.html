@@ -13,9 +13,10 @@
     <div class="container py-4">
         <h1 class="fw-bold">Pages Template</h1>
         <p>Your web page is ready to go.</p>
+        <p id="address" hidden>Hosted on <a id="link"></a></p>
         <div class="d-flex justify-content-start">
-            <button id="start-btn" type="button" class="btn btn-primary" onclick="start">Start</button>
-            <button id="stop-btn" type="button" class="btn btn-danger" onclick="stop" hidden>Stop</button>
+            <button id="start-btn" type="button" class="btn btn-primary" onclick="start()">Start</button>
+            <button id="stop-btn" type="button" class="btn btn-danger" onclick="stop()" hidden>Stop</button>
         </div>
     </div>
     <script>
@@ -41,6 +42,13 @@
 
             window.peer.on('open', function (id) {
                 console.log('My peer ID is: ' + id);
+                document.querySelector('#address').hidden = false;
+                document.querySelector('#link').href = 'https://kaangiray26.github.io/pages/' + id;
+                document.querySelector('#link').innerHTML = 'https://kaangiray26.github.io/pages/' + id;
+
+                // Change button states
+                document.querySelector('#start-btn').hidden = true;
+                document.querySelector('#stop-btn').hidden = false;
             });
 
             // Handle connections
@@ -75,12 +83,6 @@
                     'connection': connection
                 })
             })
-
-            // Hide the start button
-            document.querySelector('#start-btn').hidden = true;
-
-            // Show the stop button
-            document.querySelector('#stop-btn').hidden = false;
         }
 
         async function stop() {
@@ -88,10 +90,8 @@
             // Close all connections
             if (window.peer) window.peer.destroy();
 
-            // Hide the start button
+            // Change button states
             document.querySelector('#start-btn').hidden = true;
-
-            // Show the stop button
             document.querySelector('#stop-btn').hidden = false;
         }
     </script>
