@@ -29,6 +29,10 @@
             content = await fetch('/pages-template/templates/content.html').then(res => res.text());
         }
 
+        window.onbeforeunload = () => {
+            if (peer) peer.destroy();
+        }
+
         // Render template with params
         function render(template, params) {
             return template.replace(/{{([^}]+)}}/g, function (_, key) {

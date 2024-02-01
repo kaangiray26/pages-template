@@ -55,6 +55,10 @@
     }
 </style>
 <script>
+    window.onbeforeunload = () => {
+        if (window.peer) window.peer.destroy();
+    }
+
     // Remove the listener for the data event
     window.connection.off('data');
 
