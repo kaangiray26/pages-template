@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5" />
+    <title>Pages</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+</head>
+
+<body>
+    <div class="container py-4">
+        <h1 class="fw-bold">Pages Template</h1>
+        <p>Your web page is ready to go.</p>
+        <div class="d-flex justify-content-start">
+            <button id="start-btn" type="button" class="btn btn-primary" onclick="start">Start</button>
+            <button id="stop-btn" type="button" class="btn btn-danger" onclick="stop" hidden>Stop</button>
+        </div>
+    </div>
+    <script>
+        window.onload = async () => {
+            const content = await fetch('/templates/content.html').then(res => res.text());
+
+        }
+
+        // Render template with params
+        function render(template, params) {
+            return template.replace(/{{([^}]+)}}/g, function (_, key) {
+                return params[key];
+            });
+        }
+
+        async function start() {
+            console.log('Starting...');
+
+            // Create new peer
+            window.peer = new Peer();
+            let visitor_count = 0;
+            let connections = [];
+
+            window.peer.on('open', function (id) {
+                console.log('My peer ID is: ' + id);
+            });
+
+            // Handle connections
+            window.peer.on('connection', (connection) => {
+                connection.on('open', () => {
+                    const metadata = connection.metadata;
+                    visitor_count += 1;
+
+                    if (metadata.route == "/") {
+                        connection.send({
+                            content: render(content, {
+                                'visitor_count': visitor_count
+                            }),
+                        })
+                    }
+
+                    // Send visitor count to all connections
+                    connections.map(conn => conn.connection.send({
+                        'type': 'update',
+                        'value': visitor_count
+                    }))
+                })
+
+                // 
+                connection.on('close', () => {
+                    connections = connections.filter((conn) => conn.id != connection.peer)
+                })
+
+                // Add connection to connections list
+                connections.push({
+                    'id': connection.peer,
+                    'connection': connection
+                })
+            })
+
+            // Hide the start button
+            document.querySelector('#start-btn').hidden = true;
+
+            // Show the stop button
+            document.querySelector('#stop-btn').hidden = false;
+        }
+
+        async function stop() {
+            console.log('Stopping...');
+            // Close all connections
+            if (window.peer) window.peer.destroy();
+
+            // Hide the start button
+            document.querySelector('#start-btn').hidden = true;
+
+            // Show the stop button
+            document.querySelector('#stop-btn').hidden = false;
+        }
+    </script>
+</body>
+
+</html>

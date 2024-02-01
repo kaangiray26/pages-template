@@ -1,0 +1,66 @@
+<div id="page">
+    <div id="container">
+        <h1 class="fw-bold">Hey there!</h1>
+        <p>I think your web page is alive.</p>
+        <p><span id="count">{{visitor_count}}</span> visitors</p>
+    </div>
+</div>
+<style>
+    body {
+        background-color: #d8dee9;
+    }
+
+    #page {
+        display: flex;
+        width: 100vw;
+        height: 100vh;
+        justify-content: center;
+    }
+
+    #container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    @media (min-width: 576px) {
+        .container {
+            max-width: 540px;
+        }
+    }
+
+    @media (min-width: 768px) {
+        .container {
+            max-width: 720px;
+        }
+    }
+
+    @media (min-width: 992px) {
+        .container {
+            max-width: 960px;
+        }
+    }
+
+    @media (min-width: 1200px) {
+        .container {
+            max-width: 1140px;
+        }
+    }
+
+    @media (min-width: 1400px) {
+        .container {
+            max-width: 1320px;
+        }
+    }
+</style>
+<script>
+    // Remove the listener for the data event
+    window.connection.off('data');
+
+    // Add the new listener for the data event
+    window.connection.on('data', (data) => {
+        if (data.type == 'update') {
+            document.querySelector('#count').innerHTML = data.value;
+        }
+    })
+
+</script>
