@@ -20,9 +20,13 @@
         </div>
     </div>
     <script>
-        window.onload = async () => {
-            const content = await fetch('/pages-template/templates/content.html').then(res => res.text());
+        let content = '';
+        let peer = null;
+        let visitor_count = 0;
+        let connections = [];
 
+        window.onload = async () => {
+            content = await fetch('/pages-template/templates/content.html').then(res => res.text());
         }
 
         // Render template with params
@@ -36,11 +40,11 @@
             console.log('Starting...');
 
             // Create new peer
-            window.peer = new Peer();
-            let visitor_count = 0;
-            let connections = [];
+            peer = new Peer();
+            visitor_count = 0;
+            connections = [];
 
-            window.peer.on('open', function (id) {
+            peer.on('open', function (id) {
                 console.log('My peer ID is: ' + id);
                 document.querySelector('#address').hidden = false;
                 document.querySelector('#link').href = 'https://kaangiray26.github.io/pages/' + id;
@@ -52,14 +56,14 @@
             });
 
             // Handle connections
-            window.peer.on('connection', (connection) => {
+            peer.on('connection', (connection) => {
                 connection.on('open', () => {
                     const metadata = connection.metadata;
                     visitor_count += 1;
 
                     if (metadata.route == "/") {
                         connection.send({
-                            content: render(content, {
+                            'content': render(content, {
                                 'visitor_count': visitor_count
                             }),
                         })
@@ -88,7 +92,7 @@
         async function stop() {
             console.log('Stopping...');
             // Close all connections
-            if (window.peer) window.peer.destroy();
+            if (peer) peer.destroy();
 
             // Change button states
             document.querySelector('#start-btn').hidden = true;
